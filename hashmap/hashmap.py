@@ -9,35 +9,29 @@ class Node():
         self.next = None
 
 class Hasher:
-        def __init__(self, size):
-            self.size = size
-            self.type_mapping = {
-                int: self._integer_hash,
-                str: self._string_hash,
-            }
+    def __init__(self, size: int):
+        self.size = size
 
-        def set_size(self, size: int):
-            self.size = size
+    def set_size(self, size: int):
+        self.size = size
 
-        def add_handler(self, type: type, handler: callable):
-            if not callable(handler):
-                raise TypeError("handler must be callable :(")
-            self.type_mapping[type] = handler 
+    def hash(self, key):
+        if isinstance(key, int):
+            return self._integer_hash(key)
+        elif isinstance(key, str):
+            return self._string_hash(key)
+        else:
+            raise TypeError(f"Key type is not handled: {type(key)}")
 
-        def hash(self, key):
-            key_type = type(key)
-            if key_type not in self.type_mapping:
-                raise TypeError(f"Key type is not handled: {key_type}")
-            return self.type_mapping[key_type](key)
+    def _integer_hash(self, key: int) -> int:
+        return key % self.size
 
-        def _integer_hash(self, key: int) -> int:
-            return key % self.size
+    def _string_hash(self, key: str) -> int:
+        hash_code = 0
+        for c in key:
+            hash_code = (hash_code * 31 + ord(c)) % self.size
+        return hash_code
 
-        def _string_hash(self, key: str) -> int:
-            hash_code = 0
-            for c in key:
-                hash_code = (hash_code * 31 + ord(c)) % self.size
-            return hash_code
 
 class DynamicHashMap():
     def __init__(self, initial_capacity: int= 8, load_factor: float=0.75):
